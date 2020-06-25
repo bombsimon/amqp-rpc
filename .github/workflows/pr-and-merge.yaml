@@ -74,4 +74,4 @@ jobs:
       - name: Test and publish code coverage
         run: go test -coverprofile c.out ./...
       - name: Publish test results
-        run: GIT_BRANCH=$GITHUB_HEAD_REF GIT_COMMIT_SHA=$(git rev-parse origin/$GITHUB_HEAD_REF) ./cc-test-reporter after-build --exit-code $?
+        run: GIT_BRANCH=$GITHUB_HEAD_REF GIT_COMMIT_SHA=${{ github.event.pull_request.head.sha }} ./cc-test-reporter after-build --exit-code $?
