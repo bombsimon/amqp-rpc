@@ -7,7 +7,6 @@ on:
   pull_request:
 
 env:
-  AMQP_URL: amqp://guest:guest@127.0.0.1:45672
   CC_TEST_REPORTER_ID: 7d839e0bef19ceb83a38550bc5e651070cd1c15279069a90bdbaaad727d7c0cd
 
 jobs:
@@ -71,8 +70,8 @@ jobs:
       - name: Make cc-test-reporter executable
         run: chmod +x ./cc-test-reporter
       - name: run cc-test-reporter before-build
-        run: ./cc-test-reporter before-build
+        run:  GIT_BRANCH=$GITHUB_HEAD_REF GIT_COMMIT_SHA=$(git rev-parse origin/$GITHUB_HEAD_REF) ./cc-test-reporter before-build
       - name: Test and publish code coverage
         run: go test -coverprofile c.out ./...
       - name: Publish test results
-        run: ./cc-test-reporter after-build --exit-code $?
+        run: GIT_BRANCH=$GITHUB_HEAD_REF GIT_COMMIT_SHA=$(git rev-parse origin/$GITHUB_HEAD_REF) ./cc-test-reporter after-build --exit-code $?
