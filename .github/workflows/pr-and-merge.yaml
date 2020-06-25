@@ -54,14 +54,12 @@ jobs:
         run: go test -race -v ./...
   coverage:
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq
+        ports:
+          - 5672:5672
     steps:
-      - name: Start RabbitMQ server
-        uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 45672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
       - name: Install Go
         uses: actions/setup-go@v2
         with:
@@ -79,6 +77,7 @@ jobs:
       - name: Test and publish code coverage
         env:
           GO111MODULE: on
+          AMQP_URL: amqp://guest:guest@127.0.0.1:5672
           CC_TEST_REPORTER_ID: 7d839e0bef19ceb83a38550bc5e651070cd1c15279069a90bdbaaad727d7c0cd
         run: go test -coverprofile c.out ./...
       - name: Publish test results
