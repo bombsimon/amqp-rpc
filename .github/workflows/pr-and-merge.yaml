@@ -16,7 +16,7 @@ jobs:
         uses: golangci/golangci-lint-action@v1
         with:
           version: v1.27
-  test:
+  run-tests:
     needs: golangci-lint # run after golangci-lint action to not produce duplicated errors
     env:
       AMQP_URL: amqp://guest:guest@127.0.0.1:45672
@@ -31,18 +31,23 @@ jobs:
           - windows-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - uses: getong/rabbitmq-action@v1.2
+      - name: Start RabbitMQ server
+        uses: getong/rabbitmq-action@v1.2
         with:
           rabbitmq version: '3.8.2-management-alpine'
           host port: 45672
           rabbitmq user: 'guest'
           rabbitmq password: 'guest'
-      - uses: actions/checkout@v2
       - name: Install Go
         uses: actions/setup-go@v2
         with:
           go-version: ${{ matrix.go }}
-      - uses: actions/cache@v1
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ./src/github.com/${{ github.repository }}
+      - name: Setup cache
+        uses: actions/cache@v1
         with:
           path: ~/go/pkg/mod
           key: ${{ runner.os }}-go-${{ hashFiles('**/go.sum') }}
@@ -50,8 +55,25 @@ jobs:
       - name: Test code
         run: go test -race -v ./...
   coverage:
+    env:
+      AMQP_URL: amqp://guest:guest@127.0.0.1:45672
     runs-on: ubuntu-latest
     steps:
+      - name: Start RabbitMQ server
+        uses: getong/rabbitmq-action@v1.2
+        with:
+          rabbitmq version: '3.8.2-management-alpine'
+          host port: 45672
+          rabbitmq user: 'guest'
+          rabbitmq password: 'guest'
+      - name: Install Go
+        uses: actions/setup-go@v2
+        with:
+          go-version: 1.14
+      - name: Checkout code
+        uses: actions/checkout@v2
+        with:
+          path: ./src/github.com/${{ github.repository }}
       - name: Test & publish code coverage
         uses: paambaati/codeclimate-action@v2.6.0
         env:
