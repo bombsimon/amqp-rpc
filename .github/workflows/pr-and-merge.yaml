@@ -80,4 +80,4 @@ jobs:
           CC_TEST_REPORTER_ID: 7d839e0bef19ceb83a38550bc5e651070cd1c15279069a90bdbaaad727d7c0cd
         run: go test -coverprofile c.out ./...
       - name: Publish test results
-        run: ./cc-test-reporter after-build --exit-code $TRAVIS_TEST_RESULT
+        run: ./cc-test-reporter after-build --exit-code $?
