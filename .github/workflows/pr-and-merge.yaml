@@ -6,14 +6,6 @@ on:
       - master
   pull_request:
 
-
-services:
-  rabbitmq:
-    image: rabbitmq:3-management
-    ports:
-      - 5672:5672
-      - 15672:15672
-
 env:
   AMQP_URL: amqp://guest:guest@127.0.0.1:45672
   CC_TEST_REPORTER_ID: 7d839e0bef19ceb83a38550bc5e651070cd1c15279069a90bdbaaad727d7c0cd
@@ -38,6 +30,12 @@ jobs:
         os:
           - ubuntu-latest
     runs-on: ${{ matrix.os }}
+    services:
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672
+          - 15672:15672
     steps:
       - name: Install Go
         uses: actions/setup-go@v2
@@ -55,6 +53,12 @@ jobs:
         run: go test -race -v ./...
   coverage:
     runs-on: ubuntu-latest
+    services:
+      rabbitmq:
+        image: rabbitmq:3-management
+        ports:
+          - 5672:5672
+          - 15672:15672
     steps:
       - name: Install Go
         uses: actions/setup-go@v2
