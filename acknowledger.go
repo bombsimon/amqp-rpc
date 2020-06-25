@@ -25,7 +25,7 @@ func (a *AwareAcknowledger) Ack(tag uint64, multiple bool) error {
 }
 
 // Nack passes the Nack down to the underlying Acknowledger.
-func (a *AwareAcknowledger) Nack(tag uint64, multiple bool, requeue bool) error {
+func (a *AwareAcknowledger) Nack(tag uint64, multiple, requeue bool) error {
 	a.Handled = true
 	return a.Acknowledger.Nack(tag, multiple, requeue)
 }

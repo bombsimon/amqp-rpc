@@ -34,7 +34,7 @@ func (ma *MockAcknowledger) Ack(tag uint64, multiple bool) error {
 }
 
 // Nack increases Nacks.
-func (ma *MockAcknowledger) Nack(tag uint64, multiple bool, requeue bool) error {
+func (ma *MockAcknowledger) Nack(tag uint64, multiple, requeue bool) error {
 	ma.Nacks++
 	return nil
 }
@@ -47,7 +47,6 @@ func (ma *MockAcknowledger) Reject(tag uint64, requeue bool) error {
 
 // startAndWait will start s by running ListenAndServe, it will then block
 // until the server is started.
-// nolint: deadcode,megacheck
 func startAndWait(s *Server) func() {
 	started := make(chan struct{})
 	once := sync.Once{}
@@ -98,7 +97,7 @@ func closeConnections(names ...string) {
 	// It takes a while (0.5s - 4s) for the management plugin to discover the
 	// connections so we loop until we've found some.
 	for i := 0; i < 20; i++ {
-		resp, err := http.Get(connectionsURL) // nolint: gosec
+		resp, err := http.Get(connectionsURL) //nolint:gosec // This URL is fine!
 		if err != nil {
 			panic(err)
 		}

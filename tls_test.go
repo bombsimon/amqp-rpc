@@ -87,11 +87,11 @@ func createCertificate(priv *rsa.PrivateKey, pub rsa.PublicKey) string {
 	return f.Name()
 }
 
-func createCertificateFiles() (string, string) {
+func createCertificateFiles() (tempCert, tempKey string) {
 	key, _ := rsa.GenerateKey(rand.Reader, 2048)
 
-	tempKey := createPrivKey(key)
-	tempCert := createCertificate(key, key.PublicKey)
+	tempKey = createPrivKey(key)
+	tempCert = createCertificate(key, key.PublicKey)
 
 	return tempCert, tempKey
 }

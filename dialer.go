@@ -19,7 +19,7 @@ func DefaultDialer(network, addr string) (net.Conn, error) {
 	// Heartbeating hasn't started yet, don't stall forever on a dead server.
 	// A deadline is set for TLS and AMQP handshaking. After AMQP is established,
 	// the deadline is cleared in openComplete.
-	if err = conn.SetDeadline(time.Now().Add(2 * time.Second)); err != nil {
+	if err := conn.SetDeadline(time.Now().Add(2 * time.Second)); err != nil {
 		return nil, err
 	}
 

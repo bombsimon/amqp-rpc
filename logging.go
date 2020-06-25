@@ -147,10 +147,10 @@ func stringifyRequestForLog(v *Request) string {
 }
 
 func stringifyReturnForLog(v amqp.Return) string {
-	vals := []string{}
-
-	vals = append(vals, fmt.Sprintf("ReplyCode=%d", v.ReplyCode))
-	vals = append(vals, fmt.Sprintf("ReplyText=%s", v.ReplyText))
+	vals := []string{
+		fmt.Sprintf("ReplyCode=%d", v.ReplyCode),
+		fmt.Sprintf("ReplyText=%s", v.ReplyText),
+	}
 
 	if v.Exchange != "" {
 		vals = append(vals, fmt.Sprintf("Exchange=%s", v.Exchange))

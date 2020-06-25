@@ -26,6 +26,10 @@ func TestFanout(t *testing.T) {
 		s.Bind(FanoutBinding("fanout-exchange", fanoutHandler))
 
 		stop := startAndWait(s)
+
+		//nolint:gocritic // False positive, this is not before a return.
+		// Fixed in https://github.com/go-critic/go-critic/issues/926 but not
+		// released in golangci-lint.
 		defer stop()
 	}
 

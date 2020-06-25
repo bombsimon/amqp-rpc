@@ -129,13 +129,7 @@ func monitorAndWait(stopChan chan struct{}, amqpErrs ...chan *amqp.Error) error 
 	}
 }
 
-func createConnections(url string, config amqp.Config) (*amqp.Connection, *amqp.Connection, error) {
-	var (
-		conn1 *amqp.Connection
-		conn2 *amqp.Connection
-		err   error
-	)
-
+func createConnections(url string, config amqp.Config) (conn1, conn2 *amqp.Connection, err error) {
 	conn1, err = amqp.DialConfig(url, config)
 	if err != nil {
 		return nil, nil, err
@@ -149,13 +143,13 @@ func createConnections(url string, config amqp.Config) (*amqp.Connection, *amqp.
 	return conn1, conn2, nil
 }
 
-func createChannels(inputConn, outputConn *amqp.Connection) (*amqp.Channel, *amqp.Channel, error) {
-	inputCh, err := inputConn.Channel()
+func createChannels(inputConn, outputConn *amqp.Connection) (inputCh, outputCh *amqp.Channel, err error) {
+	inputCh, err = inputConn.Channel()
 	if err != nil {
 		return nil, nil, err
 	}
 
-	outputCh, err := outputConn.Channel()
+	outputCh, err = outputConn.Channel()
 	if err != nil {
 		return nil, nil, err
 	}

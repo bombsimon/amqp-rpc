@@ -178,6 +178,7 @@ func (c *Client) OnStarted(f OnStartedFunc) {
 }
 
 // WithDialConfig sets the dial config used for the client.
+//nolint:gocritic // No need to pass config pointer.
 func (c *Client) WithDialConfig(dc amqp.Config) *Client {
 	c.dialconfig = dc
 
@@ -185,8 +186,8 @@ func (c *Client) WithDialConfig(dc amqp.Config) *Client {
 }
 
 // WithTLS sets the TLS config in the dial config for the client.
-func (c *Client) WithTLS(tls *tls.Config) *Client {
-	c.dialconfig.TLSClientConfig = tls
+func (c *Client) WithTLS(tlsConfig *tls.Config) *Client {
+	c.dialconfig.TLSClientConfig = tlsConfig
 
 	return c
 }
@@ -394,6 +395,7 @@ func (c *Client) runOnce() error {
 		inputCh.NotifyClose(make(chan *amqp.Error)),
 		outputCh.NotifyClose(make(chan *amqp.Error)),
 	)
+
 	if err != nil {
 		return err
 	}

@@ -9,7 +9,7 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// Request is a requet to perform with the client
+// Request is a requet to perform with the client.
 type Request struct {
 	// Exchange is the exchange to which the rquest will be published when
 	// passing it to the clients send function.
