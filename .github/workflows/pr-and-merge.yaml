@@ -7,8 +7,16 @@ on:
   pull_request:
 
 
+services:
+  rabbitmq:
+    image: rabbitmq:3-management
+    ports:
+      - 5672:5672
+      - 15672:15672
+
 env:
   AMQP_URL: amqp://guest:guest@127.0.0.1:45672
+  CC_TEST_REPORTER_ID: 7d839e0bef19ceb83a38550bc5e651070cd1c15279069a90bdbaaad727d7c0cd
 
 jobs:
   golangci-lint:
@@ -31,13 +39,6 @@ jobs:
           - ubuntu-latest
     runs-on: ${{ matrix.os }}
     steps:
-      - name: Start RabbitMQ server
-        uses: getong/rabbitmq-action@v1.2
-        with:
-          rabbitmq version: '3.8.2-management-alpine'
-          host port: 45672
-          rabbitmq user: 'guest'
-          rabbitmq password: 'guest'
       - name: Install Go
         uses: actions/setup-go@v2
         with:
@@ -54,12 +55,6 @@ jobs:
         run: go test -race -v ./...
   coverage:
     runs-on: ubuntu-latest
-    services:
-      rabbitmq:
-        image: rabbitmq:3-management
-        ports:
-          - 5672:5672
-          - 15672:15672
     steps:
       - name: Install Go
         uses: actions/setup-go@v2
@@ -74,10 +69,6 @@ jobs:
       - name: run cc-test-reporter before-build
         run: ./cc-test-reporter before-build
       - name: Test and publish code coverage
-        env:
-          GO111MODULE: on
-          AMQP_URL: amqp://guest:guest@127.0.0.1:5672
-          CC_TEST_REPORTER_ID: 7d839e0bef19ceb83a38550bc5e651070cd1c15279069a90bdbaaad727d7c0cd
         run: go test -coverprofile c.out ./...
       - name: Publish test results
         run: ./cc-test-reporter after-build --exit-code $?
