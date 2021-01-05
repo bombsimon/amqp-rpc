@@ -10,33 +10,41 @@ import (
 	"github.com/streadway/amqp"
 )
 
-// nolint: gochecknoglobals
+//nolint:gochecknoglobals // OK for this example
 var timesCalled = 0
 
+const (
+	exchangeName = "cool-exchange"
+	routingKey   = "times_called"
+	uri          = "amqp://guest:guest@localhost:5672/"
+)
+
 func main() {
-	s1 := amqprpc.NewServer("amqp://guest:guest@localhost:5672/")
-	s2 := amqprpc.NewServer("amqp://guest:guest@localhost:5672/")
-	s3 := amqprpc.NewServer("amqp://guest:guest@localhost:5672/")
+	qds := amqprpc.QueueDeclareSettings{
+		Exclusive: true,
+	}
+
+	s1 := amqprpc.NewServer(uri).WithQueueDeclareSettings(qds)
+	s2 := amqprpc.NewServer(uri).WithQueueDeclareSettings(qds)
+	s3 := amqprpc.NewServer(uri).WithQueueDeclareSettings(qds)
 
 	// No need for three handlers but it's just to show that different methods
 	// will be called.
-	s1.Bind(amqprpc.FanoutBinding("cool-exchange", fanoutHandlerOne))
-	s2.Bind(amqprpc.FanoutBinding("cool-exchange", fanoutHandlerTwo))
-	s3.Bind(amqprpc.FanoutBinding("cool-exchange", fanoutHandlerThree))
+	s1.Bind(amqprpc.FanoutBinding(exchangeName, fanoutHandlerOne))
+	s2.Bind(amqprpc.FanoutBinding(exchangeName, fanoutHandlerTwo))
+	s3.Bind(amqprpc.FanoutBinding(exchangeName, fanoutHandlerThree))
 
-	s1.Bind(amqprpc.DirectBinding("times_called", timesCalledHandler))
+	s1.Bind(amqprpc.DirectBinding(routingKey, timesCalledHandler))
 
 	go s1.ListenAndServe()
-
 	go s2.ListenAndServe()
-
 	go s3.ListenAndServe()
 
 	time.Sleep(1 * time.Second)
 
-	c := amqprpc.NewClient("amqp://guest:guest@localhost:5672/")
+	c := amqprpc.NewClient(uri)
 	r := amqprpc.NewRequest().
-		WithExchange("cool-exchange").
+		WithExchange(exchangeName).
 		WithBody("Seding fanout").
 		WithResponse(false)
 
@@ -47,7 +55,7 @@ func main() {
 
 	time.Sleep(1 * time.Second)
 
-	response, err := c.Send(amqprpc.NewRequest().WithRoutingKey("times_called"))
+	response, err := c.Send(amqprpc.NewRequest().WithRoutingKey(routingKey))
 	if err != nil {
 		fmt.Println("Woops: ", err)
 	}
